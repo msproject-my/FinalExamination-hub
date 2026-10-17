@@ -3,191 +3,420 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DBS10042 Examination Hub</title>
+  <title>DBS10042 Engineering Science - Online Practice Portal</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts (Plus Jakarta Sans & Fredoka) -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4f6f9;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 20px;
-      box-sizing: border-box;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #fdf8e6;
+      color: #1e2044;
     }
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-      width: 100%;
-      max-width: 420px;
+    
+    .font-heading {
+      font-family: 'Fredoka', cursive, sans-serif;
     }
-    h2 {
-      margin-top: 0;
-      color: #1a202c;
-      text-align: center;
-      font-size: 22px;
-      margin-bottom: 20px;
+
+    /* Precise Neo-Brutalist Card Styling matching the original design screenshot */
+    .brutal-card-main {
+      border: 3.5px solid #1e2044;
+      box-shadow: 4px 6px 0px #1e2044;
+      border-radius: 24px;
     }
-    .form-group {
-      margin-bottom: 18px;
+
+    .brutal-card-sub {
+      border: 3px solid #1e2044;
+      box-shadow: 3px 5px 0px #1e2044;
+      border-radius: 20px;
     }
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 600;
-      color: #4a5568;
-      font-size: 14px;
+
+    .brutal-btn-dark {
+      background-color: #1a234d;
+      color: #ffffff;
+      border: 2px solid #1e2044;
+      box-shadow: 2px 3px 0px #1e2044;
+      transition: all 0.15s ease;
     }
-    input, select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #cbd5e0;
-      border-radius: 6px;
-      box-sizing: border-box;
-      font-size: 14px;
-      transition: border-color 0.2s;
+
+    .brutal-btn-dark:hover {
+      transform: translateY(-2px);
+      box-shadow: 3px 5px 0px #1e2044;
     }
-    input:focus, select:focus {
+
+    .brutal-btn-red {
+      background-color: #ef4444;
+      color: #ffffff;
+      border: 3px solid #1e2044;
+      box-shadow: 3px 4px 0px #1e2044;
+      transition: all 0.15s ease;
+    }
+
+    .brutal-btn-red:hover {
+      transform: translateY(-2px);
+      box-shadow: 4px 6px 0px #1e2044;
+    }
+
+    .badge-pill-pill {
+      border: 2px solid #1e2044;
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+
+    .brutal-input {
+      border: 2.5px solid #d1d5db;
+      border-radius: 14px;
       outline: none;
-      border-color: #3182ce;
-      box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+      transition: all 0.2s ease;
+      background-color: #ffffff;
     }
-    button {
-      width: 100%;
-      padding: 12px;
-      background-color: #3182ce;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background-color 0.2s;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #2b6cb0;
-    }
-    button:disabled {
-      background-color: #a0aec0;
-      cursor: not-allowed;
-    }
-    .status-msg {
-      margin-top: 18px;
-      text-align: center;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 10px;
-      border-radius: 6px;
-      display: none;
-    }
-    .status-msg.success {
-      display: block;
-      background-color: #c6f6d5;
-      color: #22543d;
-    }
-    .status-msg.error {
-      display: block;
-      background-color: #fed7d7;
-      color: #742a2a;
-    }
-    .status-msg.loading {
-      display: block;
-      background-color: #e2e8f0;
-      color: #2d3748;
+
+    .brutal-input:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
     }
   </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-8 max-w-6xl mx-auto">
 
-<div class="card">
-  <h2>DBS10042 Examination Hub</h2>
-  <form id="loginForm">
-    <div class="form-group">
-      <label for="studentName">Nama Penuh:</label>
-      <input type="text" id="studentName" required placeholder="Cth: AHMAD BIN ALI">
+  <!-- Top Navigation Header -->
+  <header class="flex justify-between items-center mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 bg-amber-400 brutal-card-sub flex items-center justify-center font-bold font-heading text-lg text-slate-900">
+        ES
+      </div>
+      <div>
+        <h1 class="font-heading font-bold text-lg leading-tight text-slate-900">DBS10042</h1>
+        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Engineering Science</p>
+      </div>
     </div>
-    <div class="form-group">
-      <label for="studentId">No. Pendaftaran (Student ID):</label>
-      <input type="text" id="studentId" required placeholder="Cth: 01DEP23F1001">
-    </div>
-    <div class="form-group">
-      <label for="studentClass">Kelas:</label>
-      <input type="text" id="studentClass" required placeholder="Cth: DEP3A">
-    </div>
-    <div class="form-group">
-      <label for="sessionTitle">Sesi Peperiksaan:</label>
-      <select id="sessionTitle" required>
-        <option value="">-- Pilih Sesi --</option>
-        <option value="SESI 1 - FINAL EXAM">SESI 1 - FINAL EXAM</option>
-        <option value="SESI 2 - QUIZ 1">SESI 2 - QUIZ 1</option>
-      </select>
-    </div>
-    <button type="submit" id="submitBtn">Log Masuk & Hantar Data</button>
-  </form>
-  <div id="statusMsg" class="status-msg"></div>
-</div>
-
-<script>
-  // Web App Deployment URL anda
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxHiPMSKN3Re3QZAvTj02QterMxHNP0T7BYzqiCewEztHsqzeR_gjqWblA7wCAqzVwP/exec";
-
-  document.getElementById("loginForm").addEventListener("submit", async function(e) {
-    // Halang form daripada auto-refresh/reload page
-    e.preventDefault();
-
-    const submitBtn = document.getElementById("submitBtn");
-    const statusMsg = document.getElementById("statusMsg");
-
-    submitBtn.disabled = true;
-    submitBtn.innerText = "Sedang Menyimpan...";
     
-    statusMsg.className = "status-msg loading";
-    statusMsg.innerText = "Menghantar data ke Google Sheets...";
+    <div class="bg-amber-100 text-amber-900 border-2 border-amber-400 font-bold text-[11px] uppercase px-4 py-2 rounded-full tracking-wide">
+      ONLINE PRACTICE PORTAL
+    </div>
+  </header>
 
-    // Format data yang akan dihantar
-    const payload = {
-      studentName: document.getElementById("studentName").value.trim(),
-      studentId: document.getElementById("studentId").value.trim(),
-      studentClass: document.getElementById("studentClass").value.trim(),
-      sessionTitle: document.getElementById("sessionTitle").value.trim(),
-      status: "LOGGED IN",
-      timestamp: new Date().toLocaleString("en-GB")
-    };
+  <!-- Main Banner Card -->
+  <section class="relative bg-gradient-to-r from-amber-300 via-orange-300 to-amber-400 brutal-card-main p-6 md:p-10 mb-6 overflow-hidden">
+    <!-- Decorative Stars/Sparkles -->
+    <i class="fa-solid fa-sparkles text-amber-100 text-2xl absolute top-4 right-1/3 opacity-80 animate-pulse"></i>
+    <i class="fa-solid fa-star text-yellow-200 text-xl absolute bottom-6 left-1/2 opacity-70"></i>
 
-    try {
-      // Gunakan text/plain untuk elak ralat CORS Preflight Google Apps Script
-      const response = await fetch(WEB_APP_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
-      });
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+      <div class="space-y-4 max-w-xl text-center md:text-left">
+        <div class="inline-flex items-center gap-2 bg-white/90 backdrop-blur brutal-card-sub px-3 py-1 text-xs font-bold text-slate-800">
+          <i class="fa-solid fa-gear text-indigo-600"></i> POLITEKNIK PORT DICKSON <span class="text-slate-400">•</span> JMSK
+        </div>
+        
+        <div>
+          <p class="text-[11px] uppercase font-extrabold text-orange-900 tracking-widest mb-1">YOUR ONLINE EXAM ZONE</p>
+          <h2 class="font-heading text-4xl md:text-5xl font-extrabold text-indigo-950 tracking-tight leading-none">
+            ENGINEERING SCIENCE
+          </h2>
+        </div>
 
-      const result = await response.json();
+        <div class="inline-block bg-red-500 text-white font-heading text-xs md:text-sm font-bold px-4 py-1.5 rounded-full border-2 border-slate-900 shadow-[2px_3px_0px_#1e2044]">
+          DBS10042 • OBJECTIVE EXAMINATION
+        </div>
 
-      if (result.ok) {
-        statusMsg.className = "status-msg success";
-        statusMsg.innerText = "Data berjaya dimasukkan ke Google Sheets!";
-        document.getElementById("loginForm").reset();
-      } else {
-        statusMsg.className = "status-msg error";
-        statusMsg.innerText = "Ralat Backend: " + (result.error || "Gagal menyimpan.");
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-      statusMsg.className = "status-msg error";
-      statusMsg.innerText = "Gagal berhubung dengan pelayan. Sila pastikan Web App URL betul dan tetapan Access diset ke 'Anyone'.";
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.innerText = "Log Masuk & Hantar Data";
+        <p class="text-xs md:text-sm font-bold text-slate-800">
+          Think smart. Choose wisely. <span class="text-amber-900 underline decoration-wavy decoration-orange-500">Show what you know!</span>
+        </p>
+
+        <!-- Feature Pills -->
+        <div class="flex flex-wrap gap-2 justify-center md:justify-start pt-1">
+          <span class="badge-pill-pill bg-yellow-200 text-slate-900"><i class="fa-solid fa-bolt text-amber-600 mr-1"></i> Quick thinking</span>
+          <span class="badge-pill-pill bg-red-200 text-slate-900"><i class="fa-solid fa-bullseye text-red-600 mr-1"></i> Aim high</span>
+          <span class="badge-pill-pill bg-blue-200 text-slate-900"><i class="fa-solid fa-user-ninja text-blue-600 mr-1"></i> Do your best</span>
+        </div>
+      </div>
+
+      <!-- Hero Visual Circle -->
+      <div class="relative flex-shrink-0">
+        <div class="w-40 h-40 md:w-52 md:h-52 rounded-full bg-yellow-200 border-4 border-slate-900 flex items-center justify-center shadow-[4px_6px_0px_#1e2044]">
+          <div class="text-6xl md:text-7xl transform -rotate-12">📣</div>
+        </div>
+        <div class="absolute -bottom-2 -left-2 text-3xl">✏️</div>
+        <div class="absolute -top-2 -right-2 text-3xl">📘</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 Summary Info Cards -->
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <!-- Info 1 -->
+    <div class="bg-amber-300 brutal-card-sub p-4 flex items-center gap-4">
+      <div class="w-12 h-12 bg-white rounded-xl border-2 border-slate-900 flex items-center justify-center text-2xl flex-shrink-0">
+        📜
+      </div>
+      <div>
+        <h4 class="font-bold text-xs uppercase tracking-wide text-slate-900">3 SESSIONS</h4>
+        <p class="text-xs font-medium text-slate-700">Choose your exam set</p>
+      </div>
+    </div>
+
+    <!-- Info 2 -->
+    <div class="bg-pink-200 brutal-card-sub p-4 flex items-center gap-4">
+      <div class="w-12 h-12 bg-white rounded-xl border-2 border-slate-900 flex items-center justify-center text-2xl flex-shrink-0">
+        🧠
+      </div>
+      <div>
+        <h4 class="font-bold text-xs uppercase tracking-wide text-slate-900">OBJECTIVE QUESTIONS</h4>
+        <p class="text-xs font-medium text-slate-700">Practice by examination session</p>
+      </div>
+    </div>
+
+    <!-- Info 3 -->
+    <div class="bg-sky-200 brutal-card-sub p-4 flex items-center gap-4">
+      <div class="w-12 h-12 bg-white rounded-xl border-2 border-slate-900 flex items-center justify-center text-2xl flex-shrink-0">
+        🎯
+      </div>
+      <div>
+        <h4 class="font-bold text-xs uppercase tracking-wide text-slate-900">A, B, C OR D</h4>
+        <p class="text-xs font-medium text-slate-700">Select the best answer</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Session Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+    <div class="flex items-center gap-3">
+      <div class="text-2xl">🚀</div>
+      <div>
+        <p class="text-[10px] font-extrabold uppercase text-amber-800 tracking-wider">READY, SET, GO!</p>
+        <h3 class="font-heading text-2xl font-bold text-slate-900">Choose your examination session</h3>
+        <p class="text-xs text-slate-600 font-medium">Pick a session below and let's get started. Good luck!</p>
+      </div>
+    </div>
+
+    <!-- Log Out / Login Status button -->
+    <button id="logoutBtn" onclick="openLoginModal('SI : 2024/2025')" class="self-start sm:self-auto bg-white hover:bg-slate-50 text-slate-900 border-2 border-slate-900 px-4 py-2 rounded-xl text-xs font-bold shadow-[2px_3px_0px_#1e2044] flex items-center gap-2">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      <span id="userStatusLabel">Log Out</span>
+    </button>
+  </div>
+
+  <!-- Main Sessions Cards Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    
+    <!-- Session 1 Card -->
+    <div class="bg-amber-300 brutal-card-sub p-5 flex flex-col justify-between hover:scale-[1.01] transition-transform">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="w-8 h-8 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center font-bold text-xs">01</span>
+          <span class="text-2xl">📝</span>
+        </div>
+        <p class="text-[10px] font-extrabold uppercase text-amber-900 tracking-wider">LET'S BEGIN</p>
+        <h4 class="font-heading text-xl font-bold text-slate-900 mb-1">SI : 2024/2025</h4>
+        <p class="text-xs text-slate-700 mb-6 font-medium">Examination set for Semester I, Session 2024/2025.</p>
+      </div>
+      <button type="button" onclick="openLoginModal('SI : 2024/2025')" class="w-full brutal-btn-dark font-bold text-xs uppercase py-3 px-4 rounded-xl flex items-center justify-between">
+        <span>ENTER SI : 2024/2025</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- Session 2 Card -->
+    <div class="bg-pink-200 brutal-card-sub p-5 flex flex-col justify-between hover:scale-[1.01] transition-transform">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="w-8 h-8 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center font-bold text-xs">02</span>
+          <span class="text-2xl">📚</span>
+        </div>
+        <p class="text-[10px] font-extrabold uppercase text-pink-900 tracking-wider">KEEP IT GOING</p>
+        <h4 class="font-heading text-xl font-bold text-slate-900 mb-1">SII : 2024/2025</h4>
+        <p class="text-xs text-slate-700 mb-6 font-medium">Examination set for Semester II, Session 2024/2025.</p>
+      </div>
+      <button type="button" onclick="openLoginModal('SII : 2024/2025')" class="w-full brutal-btn-dark font-bold text-xs uppercase py-3 px-4 rounded-xl flex items-center justify-between">
+        <span>ENTER SII : 2024/2025</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- Session 3 Card -->
+    <div class="bg-sky-200 brutal-card-sub p-5 flex flex-col justify-between hover:scale-[1.01] transition-transform">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="w-8 h-8 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center font-bold text-xs">03</span>
+          <span class="text-2xl">🏆</span>
+        </div>
+        <p class="text-[10px] font-extrabold uppercase text-sky-900 tracking-wider">YOU'VE GOT THIS</p>
+        <h4 class="font-heading text-xl font-bold text-slate-900 mb-1">Session 3</h4>
+        <p class="text-xs text-slate-700 mb-6 font-medium">Complete the paper and check your result slip at the end.</p>
+      </div>
+      <button type="button" onclick="openLoginModal('Session 3')" class="w-full brutal-btn-dark font-bold text-xs uppercase py-3 px-4 rounded-xl flex items-center justify-between">
+        <span>ENTER SESSION 3</span>
+        <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Student Login Modal (Matches image_0ab53d.png exact style) -->
+  <div id="studentModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-[#fdf8e6] border-[3.5px] border-[#1e2044] rounded-[28px] p-6 md:p-8 max-w-md w-full relative shadow-[6px_8px_0px_#f59e0b]">
+      
+      <!-- Close Button -->
+      <button onclick="closeLoginModal()" class="absolute top-4 right-4 w-8 h-8 bg-white border-2 border-slate-900 rounded-full flex items-center justify-center font-bold text-slate-800 text-sm hover:bg-slate-100">
+        ✕
+      </button>
+
+      <!-- Badge Header -->
+      <div class="mb-4">
+        <span class="inline-flex items-center gap-1.5 bg-amber-300 text-slate-900 border-2 border-slate-900 font-bold text-[11px] px-3 py-1 rounded-full shadow-[2px_2px_0px_#1e2044]">
+          🎓 DBS10042 • STUDENT LOGIN
+        </span>
+      </div>
+
+      <!-- Sparkles icon accent -->
+      <div class="absolute top-6 right-16 flex gap-1 text-amber-400 text-sm">
+        <span>✦</span><span>★</span><span>✦</span>
+      </div>
+
+      <div class="mb-6">
+        <h3 class="font-heading text-3xl font-bold text-indigo-950 leading-tight">Ready to shine?</h3>
+        <p class="text-xs text-slate-600 font-medium mt-1 leading-relaxed">
+          Please enter your details before entering the Engineering Science Examination Hub. These details will appear on your result slip.
+        </p>
+      </div>
+
+      <form id="modalLoginForm" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+            <span>✏️</span> Full name
+          </label>
+          <input type="text" id="studentName" required placeholder="Enter your full name" class="w-full p-3.5 text-sm brutal-input font-medium text-slate-800 placeholder:text-slate-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+            <span>💳</span> Student ID / Registration number
+          </label>
+          <input type="text" id="studentId" required placeholder="Enter your student ID" class="w-full p-3.5 text-sm brutal-input font-medium text-slate-800 placeholder:text-slate-400">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-800 mb-1 flex items-center gap-1.5">
+            <span>🏫</span> Class
+          </label>
+          <input type="text" id="studentClass" required placeholder="e.g. DKA1A / DKM2B" class="w-full p-3.5 text-sm brutal-input font-medium text-slate-800 placeholder:text-slate-400">
+        </div>
+
+        <!-- Hidden input for session selection -->
+        <input type="hidden" id="selectedSession" value="SI : 2024/2025">
+
+        <button type="submit" id="submitBtn" class="w-full brutal-btn-red font-heading font-bold text-sm uppercase py-4 px-4 rounded-2xl flex items-center justify-center gap-2 mt-2">
+          <span>LOGIN & ENTER HOMEPAGE</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <!-- Informational banner inside modal matching design -->
+        <div class="bg-emerald-100 border-2 border-dashed border-emerald-500 rounded-xl p-3 flex items-center gap-2 text-[11px] font-semibold text-emerald-900 mt-3">
+          <span>💡</span> Please check your name, student ID and class carefully before continuing.
+        </div>
+      </form>
+
+      <!-- Dynamic Status Message Area -->
+      <div id="statusMsg" class="mt-4 hidden p-3 rounded-xl border-2 text-xs font-bold text-center"></div>
+    </div>
+  </div>
+
+  <!-- Footer Motivation Banner -->
+  <footer class="bg-indigo-950 text-white brutal-card-sub p-4 text-center mb-6">
+    <div class="flex items-center justify-center gap-2 font-heading font-bold text-sm md:text-base text-amber-300">
+      <span>⭐</span> Believe in yourself! <span>⭐</span>
+    </div>
+    <p class="text-xs text-indigo-200 mt-1 font-medium">Every question is a chance to learn something new.</p>
+  </footer>
+
+  <p class="text-center text-[11px] font-semibold text-slate-500 mb-4">
+    DBS10042 Engineering Science • Objective Practice Portal
+  </p>
+
+  <script>
+    // URL Web App Google Apps Script Anda
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxHiPMSKN3Re3QZAvTj02QterMxHNP0T7BYzqiCewEztHsqzeR_gjqWblA7wCAqzVwP/exec";
+
+    // Modal Control Functions
+    function openLoginModal(sessionName) {
+      document.getElementById("selectedSession").value = sessionName;
+      document.getElementById("studentModal").classList.remove("hidden");
+      document.getElementById("statusMsg").classList.add("hidden");
     }
-  });
-</script>
 
+    function closeLoginModal() {
+      document.getElementById("studentModal").classList.add("hidden");
+    }
+
+    // Form Submission Handling
+    document.getElementById("modalLoginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const submitBtn = document.getElementById("submitBtn");
+      const statusMsg = document.getElementById("statusMsg");
+
+      const studentName = document.getElementById("studentName").value.trim();
+      const studentId = document.getElementById("studentId").value.trim();
+      const studentClass = document.getElementById("studentClass").value.trim();
+      const sessionTitle = document.getElementById("selectedSession").value.trim();
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span>SENDING DATA...</span> <i class="fa-solid fa-spinner animate-spin"></i>`;
+
+      statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-slate-900 bg-amber-100 text-slate-900 text-xs font-bold text-center block";
+      statusMsg.innerText = "⏳ Saving session data to Google Sheets...";
+
+      // Payload matching Code.gs expected structure
+      const payload = {
+        studentName: studentName,
+        studentId: studentId,
+        studentClass: studentClass,
+        sessionTitle: sessionTitle,
+        status: "LOGGED IN",
+        timestamp: new Date().toLocaleString("en-GB")
+      };
+
+      try {
+        // Content-Type text/plain prevents CORS preflight issues with GAS
+        const response = await fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.ok) {
+          statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-emerald-900 bg-emerald-200 text-emerald-900 text-xs font-bold text-center block";
+          statusMsg.innerText = "✅ Login successful! Data saved to Google Sheets.";
+          
+          document.getElementById("userStatusLabel").innerText = `Logged: ${studentName.split(" ")[0]}`;
+
+          setTimeout(() => {
+            closeLoginModal();
+          }, 1500);
+        } else {
+          statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-rose-900 bg-rose-200 text-rose-900 text-xs font-bold text-center block";
+          statusMsg.innerText = "❌ Backend Error: " + (result.error || "Failed to save data.");
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-rose-900 bg-rose-200 text-rose-900 text-xs font-bold text-center block";
+        statusMsg.innerText = "⚠️ Network error. Please ensure your GAS Web App deployment is set to 'Anyone'.";
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span>LOGIN & ENTER HOMEPAGE</span> <i class="fa-solid fa-arrow-right"></i>`;
+      }
+    });
+  </script>
 </body>
 </html>
