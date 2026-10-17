@@ -35,6 +35,19 @@ body{background:#fff8e8;font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial
 .login-card:before{content:"✦  ✹  ✦";position:absolute;right:18px;top:12px;color:#f3bd20;font-size:23px;letter-spacing:5px}.login-badge{display:inline-flex;align-items:center;gap:7px;background:#ffdf4e;border:2px solid #13285e;border-radius:9px;padding:7px 10px;color:#13285e;font-size:10px;font-weight:1000;letter-spacing:1px;box-shadow:2px 2px 0 #13285e}.login-card h2{font-size:clamp(27px,5vw,35px);line-height:1.05;color:#13285e;margin:17px 0 8px;font-weight:1000}.login-card>p{font-size:13px;line-height:1.55;color:#53617c;margin:0 0 20px;font-weight:650}.login-card .field{margin:0 0 14px}.login-card .field input{background:white}.login-submit{width:100%;justify-content:center;gap:10px;background:#e93443;color:white;border:3px solid #13285e;border-radius:13px;padding:14px;font-size:14px;font-weight:1000;box-shadow:0 4px 0 #13285e;margin-top:4px}.login-submit:hover{background:#c92739}.login-hint{margin-top:15px;padding:10px 12px;border-radius:12px;background:#e4f7d8;border:2px dashed #73b75a;color:#34532b;font-size:11px;font-weight:700;line-height:1.5}
 @media(max-width:520px){.login-card{padding:21px 18px;border-radius:21px}.login-card:before{font-size:18px;right:12px}}
 
+
+@media print {
+  body { background:#fff !important; color:#111 !important; }
+  body * { visibility:hidden !important; }
+  #results, #results * { visibility:visible !important; }
+  #results { display:block !important; position:absolute !important; inset:0 auto auto 0 !important; width:100% !important; padding:0 !important; margin:0 !important; }
+  #results .crumb button, #results .sectionhead, #results .panel, #results .quiz-actions, #results .notice, #results #submitStatus { display:none !important; }
+  #results .result-hero, #results .stat, #results .review { box-shadow:none !important; break-inside:avoid; }
+  #results .review { font-size:10px !important; }
+  #results .review th, #results .review td { padding:5px !important; }
+  .footer, #home, #quiz, #loginOverlay { display:none !important; }
+  @page { size:A4; margin:12mm; }
+}
 </style>
 </head>
 <body>
@@ -96,8 +109,8 @@ body{background:#fff8e8;font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial
  <div class="result-stats"><div class="stat"><b id="correctCount" style="color:var(--green)">0</b><span>Correct answers</span></div><div class="stat"><b id="wrongCount" style="color:var(--red)">0</b><span>Incorrect / unanswered</span></div><div class="stat"><b id="percentText">0%</b><span>Score</span></div></div>
  <div class="sectionhead"><div><h2>Question-by-question review</h2><p>Your answer compared with the correct answer. Measuring-instrument answers marked “Pending lecturer verification” are not included in the score.</p></div></div>
  <div style="overflow-x:auto"><table class="review"><thead><tr><th>No.</th><th>Question</th><th>Your answer</th><th>Correct answer</th><th>Status</th></tr></thead><tbody id="reviewBody"></tbody></table></div>
- <div class="sectionhead"><div><h2>Save your result</h2><p>Submit the result to the lecturer's Google Drive folder.</p></div></div>
- <div class="panel"><div class="notice" id="driveNotice">To enable Google Drive saving, the lecturer must connect this portal to the Google Apps Script web app. The result can still be downloaded now.</div><div class="quiz-actions"><button class="btn btn-outline" onclick="downloadResult()">Download result (.json)</button><button class="btn btn-primary" id="submitResultBtn" onclick="submitResult()">Submit Result to Google Drive</button></div><p id="submitStatus" class="muted" style="font-size:13px;margin-bottom:0"></p></div>
+ <div class="sectionhead"><div><h2>Download Result Slip</h2><p>Download or save this result slip as a PDF using your browser's print window.</p></div></div>
+ <div class="panel"><div class="notice" id="driveNotice">Only student name, student ID, class, and the session completion status are sent to Google Sheets. Your answers and marks are not sent.</div><div class="quiz-actions"><button class="btn btn-primary" onclick="downloadSlip()">⬇ Download Slip (PDF)</button></div><p id="submitStatus" class="muted" style="font-size:13px;margin-bottom:0"></p></div>
  <div class="quiz-actions" style="margin-top:18px"><button class="btn btn-soft" onclick="goHome()">⌂ Home / Choose another session</button><button class="btn btn-primary" onclick="retrySession()">Try this session again ↻</button></div>
 </section>
 <div class="footer">DBS10042 Engineering Science · Objective Practice Portal</div>
@@ -114,37 +127,14 @@ const SESSION_INFO = {
 let currentSession=1, currentIndex=0, answers={}, lastResult=null;
 function show(id){["home","quiz","results"].forEach(x=>document.getElementById(x).classList.toggle("hide",x!==id));window.scrollTo({top:0,behavior:"smooth"});}
 function currentQuestions(){return QUESTIONS.filter(q=>Number(q.session)===Number(currentSession));}
-async function loginStudent(event){
+function loginStudent(event){
  if(event)event.preventDefault();
  const name=document.getElementById("studentName").value.trim();
  const sid=document.getElementById("studentId").value.trim();
  const studentClass=document.getElementById("studentClass").value.trim();
  if(!name||!sid||!studentClass){alert("Please complete your name, student ID and class.");return false;}
- const loginPayload={
-  type:"login",
-  timestamp:new Date().toISOString(),
-  studentName:name,
-  studentId:sid,
-  studentClass:studentClass
- };
- const submitButton=document.querySelector("#loginForm button[type='submit']");
- if(submitButton){submitButton.disabled=true;submitButton.textContent="Saving details…";}
- try{
-  if(!DRIVE_WEB_APP_URL) throw new Error("Google Sheets endpoint is not configured.");
-  await fetch(DRIVE_WEB_APP_URL,{
-   method:"POST",
-   mode:"no-cors",
-   headers:{"Content-Type":"text/plain;charset=utf-8"},
-   body:JSON.stringify(loginPayload)
-  });
-  document.getElementById("loginOverlay").classList.add("hidden");
-  document.getElementById("home").setAttribute("data-logged-in","true");
- }catch(err){
-  alert("Your details could not be sent. Please check your internet connection and try again.");
-  if(submitButton){submitButton.disabled=false;submitButton.textContent="LOGIN & ENTER HOMEPAGE";}
-  return false;
- }
- if(submitButton){submitButton.disabled=false;submitButton.textContent="LOGIN & ENTER HOMEPAGE";}
+ document.getElementById("loginOverlay").classList.add("hidden");
+ document.getElementById("home").setAttribute("data-logged-in","true");
  return false;
 }
 function logoutStudent(){
@@ -185,6 +175,7 @@ function finishQuiz(){
  const wrong=gradable.length-correct;
  lastResult={timestamp:new Date().toISOString(),session:currentSession,sessionTitle:SESSION_INFO[currentSession].title,studentName:document.getElementById("studentName").value.trim()||"Not provided",studentId:document.getElementById("studentId").value.trim()||"Not provided",studentClass:document.getElementById("studentClass").value.trim()||"Not provided",totalQuestions:qs.length,gradableQuestions:gradable.length,correct,incorrectOrUnanswered:wrong,scorePercent:gradable.length?Math.round(correct/gradable.length*100):0,answers:qs.map(q=>({questionId:q.id,question:q.text,selectedIndex:answers[q.id]===undefined?null:answers[q.id],selectedAnswer:answers[q.id]===undefined?"Unanswered":`${"ABCD"[answers[q.id]]}. ${q.options[answers[q.id]]}`,correctIndex:Number.isInteger(q.answer)?q.answer:null,correctAnswer:Number.isInteger(q.answer)?`${"ABCD"[q.answer]}. ${q.options[q.answer]}`:"Pending lecturer verification",isCorrect:Number.isInteger(q.answer)&&answers[q.id]===q.answer}))};
  renderResults(lastResult);show("results");
+ sendSessionStatus(lastResult);
 }
 function renderResults(r){
  document.getElementById("resultName").textContent=r.studentName;
@@ -195,21 +186,35 @@ function renderResults(r){
  document.getElementById("percentText").textContent=`${r.scorePercent}%`;
  document.getElementById("resultMessage").textContent=`You answered ${r.correct} question(s) correctly. Review each answer below.`;
  document.getElementById("reviewBody").innerHTML=r.answers.map((a,i)=>`<tr><td>${i+1}</td><td>${escapeHtml(a.question)}</td><td>${escapeHtml(a.selectedAnswer)}</td><td>${escapeHtml(a.correctAnswer)}</td><td class="${a.isCorrect?'correct':'wrong'}">${a.isCorrect?'Correct':(a.correctIndex===null?'Needs review':'Incorrect')}</td></tr>`).join("");
- document.getElementById("submitStatus").textContent="";
- document.getElementById("driveNotice").textContent=DRIVE_WEB_APP_URL?"Google Drive submission is configured. Press Submit Result to send this result.":"Google Drive saving is not connected yet. You can download the result now; the lecturer needs to add the Apps Script web app URL to the code.";
+ document.getElementById("submitStatus").textContent="Saving session status to Google Sheets…";
+ document.getElementById("driveNotice").textContent="Only Name, Student ID, Class, and the completed session status are sent to Google Sheets. Marks and answers remain on this device.";
 }
 function retrySession(){startSession(currentSession);}
 function goHome(){show("home");}
-function downloadResult(){if(!lastResult)return;const blob=new Blob([JSON.stringify(lastResult,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`DBS10042_Session${lastResult.session}_${safeFile(lastResult.studentId)}.json`;a.click();URL.revokeObjectURL(a.href);}
-async function submitResult(){
+function downloadSlip(){
  if(!lastResult)return;
- if(!DRIVE_WEB_APP_URL){document.getElementById("submitStatus").textContent="Not connected yet. Download the result file, or configure the Google Apps Script URL first.";return;}
- const btn=document.getElementById("submitResultBtn");btn.disabled=true;document.getElementById("submitStatus").textContent="Sending result…";
+ const originalTitle=document.title;
+ document.title=`DBS10042_Result_Slip_${safeFile(lastResult.studentId)}_Session${lastResult.session}`;
+ window.print();
+ setTimeout(()=>{document.title=originalTitle;},500);
+}
+async function sendSessionStatus(r){
+ if(!DRIVE_WEB_APP_URL){document.getElementById("submitStatus").textContent="Google Sheets is not connected. Please contact the lecturer.";return;}
+ const statusPayload={
+  type:"result",
+  timestamp:new Date().toISOString(),
+  sessionTitle:`${r.sessionTitle} — ANSWERED`,
+  studentName:r.studentName,
+  studentId:r.studentId,
+  studentClass:r.studentClass,
+  status:"ANSWERED"
+ };
  try{
-  await fetch(DRIVE_WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(lastResult)});
-  document.getElementById("submitStatus").textContent="Submission request sent. Please check with your lecturer if the result appears in the Drive folder.";
- }catch(e){document.getElementById("submitStatus").textContent="Could not send the result. Please download the result file and contact your lecturer.";}
- finally{btn.disabled=false;}
+  await fetch(DRIVE_WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(statusPayload)});
+  document.getElementById("submitStatus").textContent="Session status submission sent. Please confirm the record appears in Google Sheets.";
+ }catch(e){
+  document.getElementById("submitStatus").textContent="Could not send the session status. Please check your internet connection and contact the lecturer.";
+ }
 }
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function safeFile(s){return String(s).replace(/[^a-z0-9_-]/gi,"_");}
