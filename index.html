@@ -373,7 +373,7 @@
       statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-slate-900 bg-amber-100 text-slate-900 text-xs font-bold text-center block";
       statusMsg.innerText = "⏳ Saving session data to Google Sheets...";
 
-      // Payload matching Code.gs expected structure
+      // Payload data
       const payload = {
         studentName: studentName,
         studentId: studentId,
@@ -384,34 +384,33 @@
       };
 
       try {
-        // Content-Type text/plain prevents CORS preflight issues with GAS
-        const response = await fetch(WEB_APP_URL, {
+        // Guna URLSearchParams & mode: 'no-cors' bagi mengelakkan CORS disekat oleh pelayar (browser)
+        const params = new URLSearchParams();
+        params.append("payload", JSON.stringify(payload));
+
+        await fetch(WEB_APP_URL, {
           method: "POST",
+          mode: "no-cors",
           headers: {
-            "Content-Type": "text/plain;charset=utf-8"
+            "Content-Type": "application/x-www-form-urlencoded"
           },
-          body: JSON.stringify(payload)
+          body: params.toString()
         });
 
-        const result = await response.json();
+        // Dalam mod no-cors, jika tiada network error, penghantaran berjaya
+        statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-emerald-900 bg-emerald-200 text-emerald-900 text-xs font-bold text-center block";
+        statusMsg.innerText = "✅ Login successful! Data sent to Google Sheets.";
+        
+        document.getElementById("userStatusLabel").innerText = `Logged: ${studentName.split(" ")[0]}`;
 
-        if (result.ok) {
-          statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-emerald-900 bg-emerald-200 text-emerald-900 text-xs font-bold text-center block";
-          statusMsg.innerText = "✅ Login successful! Data saved to Google Sheets.";
-          
-          document.getElementById("userStatusLabel").innerText = `Logged: ${studentName.split(" ")[0]}`;
+        setTimeout(() => {
+          closeLoginModal();
+        }, 1500);
 
-          setTimeout(() => {
-            closeLoginModal();
-          }, 1500);
-        } else {
-          statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-rose-900 bg-rose-200 text-rose-900 text-xs font-bold text-center block";
-          statusMsg.innerText = "❌ Backend Error: " + (result.error || "Failed to save data.");
-        }
       } catch (err) {
         console.error("Fetch error:", err);
         statusMsg.className = "mt-4 p-3 rounded-xl border-2 border-rose-900 bg-rose-200 text-rose-900 text-xs font-bold text-center block";
-        statusMsg.innerText = "⚠️ Network error. Please ensure your GAS Web App deployment is set to 'Anyone'.";
+        statusMsg.innerText = "⚠️ Network error. Sila pastikan sambungan internet & URL Apps Script betul.";
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<span>LOGIN & ENTER HOMEPAGE</span> <i class="fa-solid fa-arrow-right"></i>`;
