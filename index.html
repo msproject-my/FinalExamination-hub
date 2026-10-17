@@ -125,6 +125,7 @@ const SESSION_INFO = {
  3:{title:"Final Examination — Session 3"}
 };
 let currentSession=1, currentIndex=0, answers={}, lastResult=null;
+let loggedInStudent = {name:"", studentId:"", studentClass:""};
 function show(id){["home","quiz","results"].forEach(x=>document.getElementById(x).classList.toggle("hide",x!==id));window.scrollTo({top:0,behavior:"smooth"});}
 function currentQuestions(){return QUESTIONS.filter(q=>Number(q.session)===Number(currentSession));}
 function loginStudent(event){
@@ -133,6 +134,10 @@ function loginStudent(event){
  const sid=document.getElementById("studentId").value.trim();
  const studentClass=document.getElementById("studentClass").value.trim();
  if(!name||!sid||!studentClass){alert("Please complete your name, student ID and class.");return false;}
+ loggedInStudent = {name:name, studentId:sid, studentClass:studentClass};
+ // Send the login record immediately. The existing Code.gs accepts these fields
+ // when sessionTitle is non-empty; LOGIN is stored with status LOGGED IN.
+ sendLoginRecord(loggedInStudent);
  document.getElementById("loginOverlay").classList.add("hidden");
  document.getElementById("home").setAttribute("data-logged-in","true");
  return false;
@@ -142,6 +147,7 @@ function logoutStudent(){
  document.getElementById("studentName").value="";
  document.getElementById("studentId").value="";
  document.getElementById("studentClass").value="";
+ loggedInStudent = {name:"", studentId:"", studentClass:""};
  document.getElementById("loginOverlay").classList.remove("hidden");
  document.getElementById("home").removeAttribute("data-logged-in");
  currentSession=null; currentIndex=0; answers={}; lastResult=null;
@@ -173,7 +179,7 @@ function finishQuiz(){
  const gradable=qs.filter(q=>Number.isInteger(q.answer));
  const correct=gradable.filter(q=>answers[q.id]===q.answer).length;
  const wrong=gradable.length-correct;
- lastResult={timestamp:new Date().toISOString(),session:currentSession,sessionTitle:SESSION_INFO[currentSession].title,studentName:document.getElementById("studentName").value.trim()||"Not provided",studentId:document.getElementById("studentId").value.trim()||"Not provided",studentClass:document.getElementById("studentClass").value.trim()||"Not provided",totalQuestions:qs.length,gradableQuestions:gradable.length,correct,incorrectOrUnanswered:wrong,scorePercent:gradable.length?Math.round(correct/gradable.length*100):0,answers:qs.map(q=>({questionId:q.id,question:q.text,selectedIndex:answers[q.id]===undefined?null:answers[q.id],selectedAnswer:answers[q.id]===undefined?"Unanswered":`${"ABCD"[answers[q.id]]}. ${q.options[answers[q.id]]}`,correctIndex:Number.isInteger(q.answer)?q.answer:null,correctAnswer:Number.isInteger(q.answer)?`${"ABCD"[q.answer]}. ${q.options[q.answer]}`:"Pending lecturer verification",isCorrect:Number.isInteger(q.answer)&&answers[q.id]===q.answer}))};
+ lastResult={timestamp:new Date().toISOString(),session:currentSession,sessionTitle:SESSION_INFO[currentSession].title,studentName:loggedInStudent.name||document.getElementById("studentName").value.trim()||"Not provided",studentId:loggedInStudent.studentId||document.getElementById("studentId").value.trim()||"Not provided",studentClass:loggedInStudent.studentClass||document.getElementById("studentClass").value.trim()||"Not provided",totalQuestions:qs.length,gradableQuestions:gradable.length,correct,incorrectOrUnanswered:wrong,scorePercent:gradable.length?Math.round(correct/gradable.length*100):0,answers:qs.map(q=>({questionId:q.id,question:q.text,selectedIndex:answers[q.id]===undefined?null:answers[q.id],selectedAnswer:answers[q.id]===undefined?"Unanswered":`${"ABCD"[answers[q.id]]}. ${q.options[answers[q.id]]}`,correctIndex:Number.isInteger(q.answer)?q.answer:null,correctAnswer:Number.isInteger(q.answer)?`${"ABCD"[q.answer]}. ${q.options[q.answer]}`:"Pending lecturer verification",isCorrect:Number.isInteger(q.answer)&&answers[q.id]===q.answer}))};
  renderResults(lastResult);show("results");
  sendSessionStatus(lastResult);
 }
@@ -197,6 +203,24 @@ function downloadSlip(){
  document.title=`DBS10042_Result_Slip_${safeFile(lastResult.studentId)}_Session${lastResult.session}`;
  window.print();
  setTimeout(()=>{document.title=originalTitle;},500);
+}
+async function sendLoginRecord(student){
+ if(!DRIVE_WEB_APP_URL){return;}
+ const loginPayload={
+  type:"login",
+  timestamp:new Date().toISOString(),
+  sessionTitle:"LOGIN",
+  studentName:student.name,
+  studentId:student.studentId,
+  studentClass:student.studentClass,
+  status:"LOGGED IN"
+ };
+ try{
+  // no-cors intentionally matches the existing Web App POST setup.
+  await fetch(DRIVE_WEB_APP_URL,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(loginPayload)});
+ }catch(e){
+  console.error("Login record could not be sent to Google Sheets:",e);
+ }
 }
 async function sendSessionStatus(r){
  if(!DRIVE_WEB_APP_URL){document.getElementById("submitStatus").textContent="Google Sheets is not connected. Please contact the lecturer.";return;}
