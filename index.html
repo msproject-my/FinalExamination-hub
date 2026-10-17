@@ -58,10 +58,48 @@ body{background:#fff8e8;font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial
 .motto-attribution{margin-top:3px;color:#64708c;font-size:10px;font-style:italic;font-weight:600;line-height:1.5}
 .copyright-owner{margin-top:10px;color:#13285e;font-size:12px;font-weight:850;letter-spacing:.1px}
 .institution-line{margin-top:8px;color:#173e88;font-size:11px;font-weight:500;line-height:1.5}
+.source-reference{margin:9px auto 0;color:#173e88;font-size:11px;font-weight:650;line-height:1.5}
 .copyright-footer .copyright-notice{display:block;margin:8px auto 0;color:#64708c;font-size:10px;font-weight:500;line-height:1.45}
 @media(max-width:600px){.motto-pill{width:100%;font-size:11px;padding:10px 12px;border-radius:16px}.motto-pill .motto-quote{font-size:10px}.institution-line{font-size:10px}}
 
 .copyright-notice{display:inline-block;margin-top:8px;font-size:11px;line-height:1.5;opacity:.82;max-width:900px}
+</style>
+<style>
+/* Layout refinements: prevent session heading overlap and balance controls */
+.session-intro{margin-top:18px;padding-top:4px;align-items:center}
+.logout-home-btn{font-size:12px;padding:7px 10px;min-height:34px;box-shadow:2px 2px 0 #10255b}
+.session-card:nth-child(4) .session-btn,
+.session-card:nth-child(5) .session-btn{width:auto;min-width:190px;align-self:center;justify-content:center;gap:10px;padding-left:18px;padding-right:18px}
+@media(max-width:700px){
+ .session-intro{margin-top:16px;gap:10px}
+ .logout-home-btn{font-size:11px;padding:6px 9px;min-height:30px;margin:4px 0 0 auto}
+ .session-card:nth-child(4) .session-btn,
+ .session-card:nth-child(5) .session-btn{align-self:center;width:auto;max-width:100%}
+}
+</style>
+
+<style>
+/* Sessions 4 and 5: cohesive decorative cards, balanced placement, same style as Sessions 1–3. */
+@media(min-width:761px){
+ .redesigned-sessions{grid-template-columns:repeat(6,minmax(0,1fr));}
+ .redesigned-sessions>.session-card:nth-child(-n+3){grid-column:span 2;}
+ .redesigned-sessions>.session-card:nth-child(4){grid-column:2 / span 2;transform:translateX(10px);}
+ .redesigned-sessions>.session-card:nth-child(5){grid-column:4 / span 2;transform:translateX(10px);}
+}
+.session-purple{background:linear-gradient(135deg,#e4d6ff 0%,#d2baff 100%);border-color:#fff;}
+.session-green{background:linear-gradient(135deg,#d7f7cf 0%,#b8edb1 100%);border-color:#fff;}
+.session-purple .session-tag{color:#6841b5;}
+.session-green .session-tag{color:#20783a;}
+.session-purple .session-icon{background:#fff;}
+.session-green .session-icon{background:#fff;}
+.session-card:nth-child(4) .card-decoration{color:#ffffffa8;right:15px;bottom:59px;font-size:64px;text-shadow:2px 2px 0 #8b69cf;transform:rotate(15deg);}
+.session-card:nth-child(5) .card-decoration{color:#ffffffad;right:15px;bottom:59px;font-size:64px;text-shadow:2px 2px 0 #55a94b;transform:rotate(15deg);}
+.session-card:nth-child(4) .session-btn,.session-card:nth-child(5) .session-btn{width:100%;min-width:0;align-self:stretch;justify-content:space-between;gap:8px;padding-left:12px;padding-right:12px;}
+@media(max-width:760px){
+ .redesigned-sessions{grid-template-columns:1fr;}
+ .redesigned-sessions>.session-card:nth-child(4),.redesigned-sessions>.session-card:nth-child(5){grid-column:auto;transform:none;}
+ .session-card:nth-child(4) .session-btn,.session-card:nth-child(5) .session-btn{width:100%;max-width:none;align-self:stretch;}
+}
 </style>
 </head>
 <body>
@@ -100,18 +138,13 @@ body{background:#fff8e8;font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial
   </div>
   <div class="hero-bottom-shape"></div>
  </div>
- <div class="home-facts">
-  <div class="fact-card fact-yellow"><span class="fact-icon">📝</span><div><b>3 SESSIONS</b><small>Choose your exam set</small></div></div>
-  <div class="fact-card fact-pink"><span class="fact-icon">🧠</span><div><b>OBJECTIVE QUESTIONS</b><small>Practice by examination session</small></div></div>
-  <div class="fact-card fact-blue"><span class="fact-icon">🎯</span><div><b>A, B, C OR D</b><small>Select the best answer</small></div></div>
- </div>
  <div class="session-intro"><div class="intro-icon">🚀</div><div><div class="section-kicker">READY, SET, GO!</div><h2>Choose your examination session</h2><p>Pick a session below and let's get started. Good luck!</p></div><div class="intro-doodle">✦</div><button class="btn btn-outline logout-home-btn" type="button" onclick="logoutStudent()">↪ Log Out</button></div>
  <div class="sessions redesigned-sessions">
-  <article class="session-card session-yellow"><div class="session-topline"><span class="session-number">01</span><span class="session-emoji">📝</span></div><div class="session-tag">LET'S BEGIN</div><h3>SI : 2024/2025</h3><p>Examination set for Semester I, Session 2024/2025.</p><button class="btn session-btn" onclick="startSession(1)">ENTER SI : 2024/2025 <span>➜</span></button><div class="card-decoration">✦</div></article>
-  <article class="session-card session-pink"><div class="session-topline"><span class="session-number">02</span><span class="session-emoji">📚</span></div><div class="session-tag">KEEP IT GOING</div><h3>SII : 2024/2025</h3><p>Examination set for Semester II, Session 2024/2025.</p><button class="btn session-btn" onclick="startSession(2)">ENTER SII : 2024/2025 <span>➜</span></button><div class="card-decoration">✿</div></article>
-  <article class="session-card session-blue"><div class="session-topline"><span class="session-number">03</span><span class="session-emoji">🏆</span></div><div class="session-tag">YOU'VE GOT THIS</div><h3>Session 3</h3><p>Complete the paper and check your result slip at the end.</p><button class="btn session-btn" onclick="startSession(3)">ENTER SESSION 3 <span>➜</span></button><div class="card-decoration">✦</div></article>
-  <article class="session-card session-purple"><div class="session-topline"><span class="session-number">04</span><span class="session-emoji">📘</span></div><div class="session-tag">SI : 2025/2026</div><h3>Session 4</h3><p>Engineering Science objective practice.</p><button class="btn session-btn" onclick="startSession(4)">ENTER SESSION 4 <span>➜</span></button><div class="card-decoration">✦</div></article>
-  <article class="session-card session-purple"><div class="session-topline"><span class="session-number">05</span><span class="session-emoji">📗</span></div><div class="session-tag">SII : 2025/2026</div><h3>Session 5</h3><p>Engineering Science objective practice.</p><button class="btn session-btn" onclick="startSession(5)">ENTER SESSION 5 <span>➜</span></button><div class="card-decoration">✦</div></article>
+  <article class="session-card session-yellow"><div class="session-topline"><span class="session-number">01</span><span class="session-emoji">📝</span></div><div class="session-tag">EXAMINATION SESSION</div><h3>SI : 2024/2025</h3><p>Semester I, Session 2024/2025.</p><button class="btn session-btn" onclick="startSession(1)">ENTER SESSION <span>➜</span></button><div class="card-decoration">✦</div></article>
+  <article class="session-card session-pink"><div class="session-topline"><span class="session-number">02</span><span class="session-emoji">📚</span></div><div class="session-tag">EXAMINATION SESSION</div><h3>SII : 2024/2025</h3><p>Semester II, Session 2024/2025.</p><button class="btn session-btn" onclick="startSession(2)">ENTER SESSION <span>➜</span></button><div class="card-decoration">✿</div></article>
+  <article class="session-card session-blue"><div class="session-topline"><span class="session-number">03</span><span class="session-emoji">🏆</span></div><div class="session-tag">EXAMINATION SESSION</div><h3>Session 3</h3><p>Engineering Science objective examination.</p><button class="btn session-btn" onclick="startSession(3)">ENTER SESSION <span>➜</span></button><div class="card-decoration">✦</div></article>
+  <article class="session-card session-purple session-four"><div class="session-topline"><span class="session-number">04</span><span class="session-emoji">📘</span></div><div class="session-tag">EXAMINATION SESSION</div><h3>SI : 2025/2026</h3><p>Semester I, Session 2025/2026.</p><button class="btn session-btn" onclick="startSession(4)">ENTER SESSION <span>➜</span></button><div class="card-decoration">✦</div></article>
+  <article class="session-card session-green session-five"><div class="session-topline"><span class="session-number">05</span><span class="session-emoji">📗</span></div><div class="session-tag">EXAMINATION SESSION</div><h3>SII : 2025/2026</h3><p>Semester II, Session 2025/2026.</p><button class="btn session-btn" onclick="startSession(5)">ENTER SESSION <span>➜</span></button><div class="card-decoration">✦</div></article>
  </div>
  <div class="home-footer-banner"><span>⭐</span><div><b>Believe in yourself!</b><small>Every question is a chance to learn something new.</small></div><span>⭐</span></div>
 </section>
@@ -131,9 +164,9 @@ body{background:#fff8e8;font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial
 </section>
 <div class="footer copyright-footer">
  <div class="motto-pill">“Pelajarilah adab sebelum engkau mempelajari ilmu.”<br><span class="motto-quote">“Ilmu tanpa adab itu umpama api yang membakar diri, manakala adab tanpa ilmu pula umpama jasad tanpa roh.”</span><br><span class="motto-attribution">— Imam Malik Rahimahullah</span></div>
+ <div class="source-reference">Source Reference: Final Examination Questions, Department of Mathematics, Science and Computer (JMSK)</div>
  <div class="copyright-owner">Hak Cipta Terpelihara © MOHDSAIFULPAHRUDIN</div>
  <div class="institution-line">DBS10042 Engineering Science • Jabatan Sains, Matematik dan Komputer, Politeknik Port Dickson</div>
- <span class="copyright-notice">Kandungan dan kod sumber dilindungi hak cipta. Penyalinan, pengedaran atau pengubahsuaian tanpa kebenaran adalah dilarang.</span>
 </div>
 </main>
 <script>
