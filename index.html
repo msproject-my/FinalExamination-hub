@@ -101,6 +101,27 @@ body{background:#fff8e8;font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial
  .session-card:nth-child(4) .session-btn,.session-card:nth-child(5) .session-btn{width:100%;max-width:none;align-self:stretch;}
 }
 </style>
+
+<style>
+/* Disclaimer popup shown every time a student chooses an examination set. */
+.disclaimer-overlay{position:fixed;inset:0;z-index:10001;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(13,29,53,.78);backdrop-filter:blur(7px)}
+.disclaimer-overlay.hidden{display:none!important}
+.disclaimer-card{width:min(100%,720px);max-height:calc(100vh - 36px);overflow:auto;background:#fff;border:1px solid #d7e1ef;border-radius:22px;padding:clamp(20px,4vw,32px);box-shadow:0 25px 80px #07152b60;color:#172337}
+.disclaimer-heading{text-align:center;border-bottom:1px solid #e1e8f2;padding-bottom:18px;margin-bottom:18px}
+.disclaimer-mark{width:50px;height:50px;margin:0 auto 12px;display:grid;place-items:center;border-radius:15px;background:#eaf2ff;color:#2463eb;font-size:25px}
+.disclaimer-heading h2{font-size:22px;letter-spacing:.04em;margin:0 0 5px}
+.disclaimer-heading p{color:#64748b;margin:0;font-size:13px}
+.disclaimer-set{display:inline-block;margin-top:12px;padding:6px 11px;background:#edf4ff;color:#234a88;border-radius:999px;font-weight:800;font-size:12px;letter-spacing:.06em}
+.disclaimer-item{margin:15px 0}
+.disclaimer-item h3{font-size:14px;margin:0 0 6px;color:#17365e}
+.disclaimer-item p{font-size:13px;line-height:1.62;margin:0 0 5px}
+.disclaimer-item .ms{color:#58677a;font-style:italic}
+.disclaimer-ack{margin-top:18px;padding:12px 14px;background:#f4f7fb;border-radius:12px;font-size:13px;line-height:1.5;text-align:center}
+.disclaimer-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:20px}
+.disclaimer-actions button{min-width:140px}
+@media(max-width:520px){.disclaimer-card{border-radius:17px;padding:19px}.disclaimer-heading h2{font-size:19px}.disclaimer-actions{flex-direction:column-reverse}.disclaimer-actions button{width:100%}}
+</style>
+
 </head>
 <body>
 <div id="loginOverlay" class="login-overlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
@@ -169,6 +190,43 @@ body{background:#fff8e8;font-family:"Trebuchet MS","Arial Rounded MT Bold",Arial
  <div class="institution-line">DBS10042 Engineering Science • Jabatan Sains, Matematik dan Komputer, Politeknik Port Dickson</div>
 </div>
 </main>
+
+<div id="disclaimerOverlay" class="disclaimer-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="disclaimerTitle">
+ <div class="disclaimer-card">
+  <div class="disclaimer-heading">
+   <div class="disclaimer-mark" aria-hidden="true">ⓘ</div>
+   <h2 id="disclaimerTitle">IMPORTANT NOTICE</h2>
+   <p>DBS10042 Engineering Science · Online Practice</p>
+   <span id="disclaimerSetLabel" class="disclaimer-set">SET</span>
+  </div>
+  <section class="disclaimer-item">
+   <h3>1. Source of Questions</h3>
+   <p>The questions provided on this platform are based on past final examination questions for DBS10042 Engineering Science.</p>
+   <p class="ms">Soalan yang disediakan dalam platform ini adalah berdasarkan soalan peperiksaan akhir terdahulu bagi kursus DBS10042 Engineering Science.</p>
+  </section>
+  <section class="disclaimer-item">
+   <h3>2. Question Format</h3>
+   <p>The original questions have been adapted into a multiple-choice format to facilitate online practice, assessment and answer checking.</p>
+   <p class="ms">Soalan asal telah disesuaikan kepada format objektif bagi memudahkan latihan dalam talian, penilaian dan semakan jawapan.</p>
+  </section>
+  <section class="disclaimer-item">
+   <h3>3. Final Examination Disclaimer</h3>
+   <p>The questions are provided for practice purposes only. Their inclusion on this platform does not guarantee or imply that the same questions will appear in the actual final examination.</p>
+   <p class="ms">Soalan yang disediakan adalah untuk tujuan latihan sahaja. Penyediaan soalan dalam platform ini tidak menjamin atau bermaksud bahawa soalan yang sama akan keluar dalam peperiksaan akhir sebenar.</p>
+  </section>
+  <section class="disclaimer-item">
+   <h3>4. Purpose of the Platform</h3>
+   <p>This platform is designed to support students in revising key topics and preparing for the final examination through online practice.</p>
+   <p class="ms">Platform ini dibangunkan bagi membantu pelajar mengulang kaji topik-topik utama dan membuat persediaan menghadapi peperiksaan akhir melalui latihan dalam talian.</p>
+  </section>
+  <div class="disclaimer-ack"><strong>By proceeding, you acknowledge that you have read and understood this notice.</strong><br><em>Dengan meneruskan latihan, anda mengakui bahawa anda telah membaca dan memahami notis ini.</em></div>
+  <div class="disclaimer-actions">
+   <button type="button" class="btn btn-outline" onclick="cancelDisclaimer()">BACK</button>
+   <button type="button" class="btn btn-primary" onclick="acceptDisclaimer()">I HAVE READ &amp; UNDERSTOOD</button>
+  </div>
+ </div>
+</div>
+
 <script>
 // Copyright notice and basic copy-deterrence. These measures are not a security boundary.
 (function copyrightProtection(){
@@ -222,7 +280,27 @@ function logoutStudent(){
  show("home");
  window.scrollTo({top:0,behavior:"smooth"});
 }
-function startSession(n){if(document.getElementById("loginOverlay")&&!document.getElementById("loginOverlay").classList.contains("hidden")){document.getElementById("loginForm").reportValidity();return;}currentSession=n;currentIndex=0;answers={};document.getElementById("sessionEyebrow").textContent="FINAL EXAMINATION · "+SESSION_INFO[n].title;document.getElementById("sessionTitle").textContent=SESSION_INFO[n].title;renderAllQuestions();show("quiz");}
+let pendingSession = null;
+function startSession(n){
+ if(document.getElementById("loginOverlay")&&!document.getElementById("loginOverlay").classList.contains("hidden")){
+  document.getElementById("loginForm").reportValidity();
+  return;
+ }
+ pendingSession = n;
+ document.getElementById("disclaimerSetLabel").textContent = "SET " + n;
+ document.getElementById("disclaimerOverlay").classList.remove("hidden");
+}
+function cancelDisclaimer(){
+ pendingSession = null;
+ document.getElementById("disclaimerOverlay").classList.add("hidden");
+}
+function acceptDisclaimer(){
+ if(pendingSession===null)return;
+ const n = pendingSession;
+ pendingSession = null;
+ document.getElementById("disclaimerOverlay").classList.add("hidden");
+ currentSession=n;currentIndex=0;answers={};document.getElementById("sessionEyebrow").textContent="FINAL EXAMINATION · "+SESSION_INFO[n].title;document.getElementById("sessionTitle").textContent=SESSION_INFO[n].title;renderAllQuestions();show("quiz");
+}
 function renderAllQuestions(){
  const qs=currentQuestions(),container=document.getElementById("questionContainer");
  document.getElementById("progressLabel").textContent=`${qs.length} objective questions`;
